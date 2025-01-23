@@ -36,29 +36,6 @@ class HouseholdController extends Controller
         return new HouseholdResource($household);
     }
 
-    //public function invite(Request $request, Household $household)
-    //{
-    //    try {
-    //        Gate::authorize('update', $household);
-    //    } catch (AuthorizationException $e) {
-    //        Log::channel('custom')->warning('Unauthorized invite detected', [
-    //            'user_id' => Auth::id(),
-    //            'household_id' => $household->id,
-    //            'time' => date('d.m.Y H:i:s', now()->timestamp)
-    //        ]);
-    //        return response()->json(['message' => 'You are not the owner of this household'], 403);
-    //    }
-    //    $request->validate(['email' => 'required|email']);
-//
-    //    $user = User::where('email', $request->email)->first();
-    //    if (!$user) {
-    //        return response()->json(['message' => 'User not found'], 404);
-    //    }
-//
-    //    $household->users()->attach($user->id);
-    //    return response()->json(['message' => 'User invited']);
-    //}
-
     public function leave(Household $household)
     {
         $household->users()->detach(Auth::id());
