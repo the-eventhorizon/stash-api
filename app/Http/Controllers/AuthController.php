@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserMinimalResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -50,7 +51,7 @@ class AuthController extends Controller
 
     public function logout()
     {
-        Auth::user()->tokens()->delete();
+        Auth::user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Logged out']);
     }
 
@@ -64,5 +65,23 @@ class AuthController extends Controller
     public function getUser()
     {
         return new UserResource(Auth::user());
+    }
+
+    public function changePassword(Request $request)
+    {
+
+        $user = Auth::user();
+        $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if(!Hash::check($request->current_password, $user->password)) {
+            return response()->json(['message' => 'Invalid current password'], 422);
+        }
+
+        $user->password = $request->password;
+
+        return new UserMinimalResource($user);
     }
 }

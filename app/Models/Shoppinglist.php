@@ -10,6 +10,15 @@ class Shoppinglist extends Model
 {
     protected $fillable = ['name', 'household_id', 'user_id'];
 
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::deleting(function (Shoppinglist $shoppinglist) {
+            $shoppinglist->items()->delete();
+        });
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(Item::class);

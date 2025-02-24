@@ -55,7 +55,43 @@ class User extends Authenticatable
         parent::boot();
 
         static::creating(function ($user) {
-            $user->code = strtoupper(Str::random(8));
+            $maxAttempts = 5;
+            $attempts = 0;
+            $randomLength = 8;
+            $maxLength = 12;
+
+            do {
+                $possibleCombinations = pow(36, $randomLength); // 36 because we use 0-9 and A-Z, no lower case
+                $existingCodes = self::whereRaw('LENGTH(code) = ?', [$randomLength])->count();
+
+                if ($existingCodes >= $possibleCombinations) {
+                    if ($randomLength >= $maxLength) {
+                        throw new \Exception('All possible combinations are used');
+                    }
+                    $randomLength++;
+                    $attempts = 0;
+                    continue;
+                }
+                
+                $code = strtoupper(Str::random($randomLength));
+
+                //check if code already exists
+                $exists = self::where('code', $code)->exists();
+
+                if (!$exists) {
+                    $user->code = $code;
+                    break;
+                }
+                $attempts++;
+
+                if ($attempts >= $maxAttempts) {
+                    if ($randomLength >= $maxLength) {
+                        throw new \Exception('Could not generate unique code');
+                    }
+                    $randomLength++;
+                    $attempts = 0;
+                }
+            } while (true);
         });
     }
 

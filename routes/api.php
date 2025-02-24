@@ -48,6 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/user/invitations/{invitation}', [HouseholdController::class, 'respondToInvitation']);
 
     Route::get('/user', [AuthController::class, 'getUser']);
+    Route::post('/user/{user}/change-password', [AuthController::class, 'changePassword']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::delete('/user/{user}', [AuthController::class, 'destroy']);
 });
